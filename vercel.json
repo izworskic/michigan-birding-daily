@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/chris-izworski", "destination": "/api/chris-izworski" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/post/:slug", "destination": "/api/post/[slug]" },
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
+  "crons": [
+    { "path": "/api/cron", "schedule": "0 13 * * *" }
+  ]
+}
