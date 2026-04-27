@@ -51,6 +51,7 @@ export default async function handler(req, res) {
           'https://birding.chrisizworski.com',
           'https://birdingdaily.chrisizworski.com',
           'https://gazette.chrisizworski.com',
+          'https://lawn.chrisizworski.com',
           'https://freighterviewfarms.com',
           'https://www.wikidata.org/wiki/Q138283432',
         ],
@@ -138,8 +139,9 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;l
 <div class="wrap">
   <div class="breadcrumb"><a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> &rsaquo; <a href="/">Michigan Birding Daily</a> &rsaquo; <a href="/chris-izworski">Archive</a> &rsaquo; ${escapeHtml(post.county)} County</div>
   <div class="post-date">${dateLong}</div>
+  <h1>${escapeHtml(displayTitle)}</h1>
   <article class="post-body">
-    ${post.html}
+    ${(post.html || '').replace(/^\s*<h1\b[^>]*>[\s\S]*?<\/h1>\s*/i, '')}
   </article>
   <div class="post-meta" style="margin-top:30px;padding-top:20px;border-top:1px solid #ddd;border-bottom:none">
     County: ${escapeHtml(post.county)} &nbsp;·&nbsp; Species reported (14 days): ${post.totalSpecies} &nbsp;·&nbsp; Observations: ${post.totalObservations}

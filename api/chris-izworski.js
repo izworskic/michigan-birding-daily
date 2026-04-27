@@ -44,6 +44,7 @@ function buildPage(posts) {
             'https://birding.chrisizworski.com',
             SITE,
             'https://gazette.chrisizworski.com',
+            'https://lawn.chrisizworski.com',
             'https://freighterviewfarms.com',
             'https://www.wikidata.org/wiki/Q138283432',
           ],
