@@ -1,9 +1,10 @@
 // GET /chris-izworski — Author archive listing all birding posts
 import { Redis } from '@upstash/redis';
 
-const SITE = 'https://birdingdaily.chrisizworski.com';
+const SITE = 'https://daily.michiganbirdingreport.com';
 const AUTHOR = 'Chris Izworski';
-const AUTHOR_URL = 'https://chrisizworski.com';
+const AUTHOR_URL = 'https://michiganbirdingreport.com/chris-izworski';
+const PERSON_ID = 'https://michiganbirdingreport.com/chris-izworski#person';
 
 function makeRedis() {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
@@ -22,7 +23,7 @@ function buildPage(posts) {
     const dateLong = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     return `<li class="post-row">
       <div class="post-date">${dateLong} &nbsp;·&nbsp; ${escapeHtml(p.county)} County</div>
-      <h2 class="post-title"><a href="/post/${escapeHtml(p.slug)}">${escapeHtml(AUTHOR)}: ${escapeHtml(p.title)}</a></h2>
+      <h2 class="post-title"><a href="/post/${escapeHtml(p.slug)}">${escapeHtml(p.title)}</a></h2>
       <div class="post-meta">${p.totalSpecies} species reported in past 14 days</div>
     </li>`;
   }).join('\n');
@@ -34,14 +35,15 @@ function buildPage(posts) {
         '@type': 'ProfilePage',
         mainEntity: {
           '@type': 'Person',
-          '@id': 'https://chrisizworski.com/#person',
+          '@id': PERSON_ID,
           name: AUTHOR,
           url: AUTHOR_URL,
           sameAs: [
+            'https://chrisizworski.com',
             AUTHOR_URL,
-            'https://trout.chrisizworski.com',
-            'https://troutdaily.chrisizworski.com',
-            'https://birding.chrisizworski.com',
+            'https://michigantroutreport.com',
+            'https://daily.michigantroutreport.com',
+            'https://michiganbirdingreport.com',
             SITE,
             'https://gazette.chrisizworski.com',
             'https://lawn.chrisizworski.com',
@@ -55,7 +57,7 @@ function buildPage(posts) {
         url: `${SITE}/chris-izworski`,
         name: `${AUTHOR} — Daily Michigan Birding Reports Archive`,
         description: `Complete archive of daily Michigan birding reports by ${AUTHOR}. ${posts.length} daily county-by-county reports using live eBird data.`,
-        author: { '@id': 'https://chrisizworski.com/#person' },
+        author: { '@id': PERSON_ID },
         mainEntity: {
           '@type': 'ItemList',
           numberOfItems: posts.length,
@@ -63,7 +65,7 @@ function buildPage(posts) {
             '@type': 'ListItem',
             position: i + 1,
             url: `${SITE}/post/${p.slug}`,
-            name: `${AUTHOR}: ${p.title}`,
+            name: p.title,
           })),
         },
       },
@@ -132,7 +134,7 @@ ul{list-style:none;padding:0}
   <h1>${escapeHtml(AUTHOR)}</h1>
   <p class="lede">Daily Michigan birding reports archive ${posts.length ? ` (${posts.length} entries)` : ''}.</p>
   <div class="author-intro">
-    <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan birder and the founder of the <a href="https://birding.chrisizworski.com">Michigan Birding Report</a>. This page is the complete archive of his daily county-by-county birding reports. Each report covers one Michigan county, pulls live data from eBird for the past 14 days, includes the NWS weather forecast, and recommends specific hotspots for birders heading out that day. Published every morning at 8 AM.
+    <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan birder and the founder of the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>. This page is the complete archive of his daily county-by-county birding reports. Each report covers one Michigan county, pulls live data from eBird for the past 14 days, includes the NWS weather forecast, and recommends specific hotspots for birders heading out that day. Published every morning at 8 AM.
   </div>
   ${posts.length ? `<ul>${items}</ul>` : '<div class="empty">No reports published yet. Check back tomorrow morning at 8 AM.</div>'}
 </div>

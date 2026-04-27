@@ -26,30 +26,36 @@ export default async function handler(req, res) {
     return res.status(500).send(`<h1>Error</h1><p>${escapeHtml(e.message)}</p>`);
   }
 
-  const SITE = 'https://birdingdaily.chrisizworski.com';
+  const SITE = 'https://daily.michiganbirdingreport.com';
   const AUTHOR = 'Chris Izworski';
-  const AUTHOR_URL = 'https://chrisizworski.com';
+  const AUTHOR_URL = 'https://michiganbirdingreport.com/chris-izworski';
+  const PERSON_ID = 'https://michiganbirdingreport.com/chris-izworski#person';
   const postUrl = `${SITE}/post/${post.slug}`;
-  const displayTitle = `${AUTHOR}: ${post.title}`;
+  const displayTitle = post.title;
 
   const dateLong = new Date(post.date + 'T12:00:00Z').toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
   });
+  const featured = post.featuredSighting || null;
+  const featuredText = featured?.comName
+    ? ` Featured sighting: ${featured.comName} at ${featured.locName}.`
+    : '';
 
   const schema = JSON.stringify({
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'Person',
-        '@id': 'https://chrisizworski.com/#person',
+        '@id': PERSON_ID,
         name: AUTHOR,
         url: AUTHOR_URL,
         sameAs: [
+          'https://chrisizworski.com',
           AUTHOR_URL,
-          'https://trout.chrisizworski.com',
-          'https://troutdaily.chrisizworski.com',
-          'https://birding.chrisizworski.com',
-          'https://birdingdaily.chrisizworski.com',
+          'https://michigantroutreport.com',
+          'https://daily.michigantroutreport.com',
+          'https://michiganbirdingreport.com',
+          'https://daily.michiganbirdingreport.com',
           'https://gazette.chrisizworski.com',
           'https://lawn.chrisizworski.com',
           'https://freighterviewfarms.com',
@@ -59,14 +65,15 @@ export default async function handler(req, res) {
       {
         '@type': 'Article',
         headline: displayTitle,
-        author: { '@id': 'https://chrisizworski.com/#person' },
+        author: { '@id': PERSON_ID },
         publisher: { '@type': 'Organization', name: 'Michigan Birding Daily', url: SITE },
         datePublished: post.date,
         dateModified: post.date,
         url: postUrl,
         mainEntityOfPage: postUrl,
         about: { '@type': 'AdministrativeArea', name: `${post.county} County, Michigan` },
-        keywords: `${post.county} County birding, Michigan birding, ${AUTHOR}, eBird, Michigan birds`,
+        mentions: featured?.comName ? { '@type': 'Thing', name: featured.comName } : undefined,
+        keywords: `${post.county} County birding, Michigan birding, ${featured?.comName || ''}, ${AUTHOR}, eBird, Michigan birds`,
       },
       {
         '@type': 'BreadcrumbList',
@@ -85,14 +92,14 @@ export default async function handler(req, res) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(displayTitle)} | Michigan Birding Daily</title>
-<meta name="description" content="${escapeHtml(AUTHOR)} on birding in ${escapeHtml(post.county)} County, Michigan. ${post.totalSpecies} species reported in the last two weeks, live eBird data, weather, and hotspot recommendations.">
+<meta name="description" content="Daily birding report by ${escapeHtml(AUTHOR)} for ${escapeHtml(post.county)} County, Michigan. ${post.totalSpecies} species reported in the last two weeks.${escapeHtml(featuredText)} Live eBird data, weather, and hotspot recommendations.">
 <meta name="author" content="${escapeHtml(AUTHOR)}">
 <meta name="keywords" content="${escapeHtml(post.county)} County birding, Michigan birding, eBird ${escapeHtml(post.county)}, ${escapeHtml(AUTHOR)}">
 <link rel="canonical" href="${postUrl}">
 <link rel="author" href="${AUTHOR_URL}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="${escapeHtml(displayTitle)}">
-<meta property="og:description" content="${escapeHtml(AUTHOR)} on birding in ${escapeHtml(post.county)} County, Michigan.">
+<meta property="og:description" content="Daily birding report by ${escapeHtml(AUTHOR)} for ${escapeHtml(post.county)} County, Michigan.">
 <meta property="og:url" content="${postUrl}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${escapeHtml(displayTitle)}">
@@ -144,19 +151,19 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;l
     ${(post.html || '').replace(/^\s*<h1\b[^>]*>[\s\S]*?<\/h1>\s*/i, '')}
   </article>
   <div class="post-meta" style="margin-top:30px;padding-top:20px;border-top:1px solid #ddd;border-bottom:none">
-    County: ${escapeHtml(post.county)} &nbsp;·&nbsp; Species reported (14 days): ${post.totalSpecies} &nbsp;·&nbsp; Observations: ${post.totalObservations}
+    County: ${escapeHtml(post.county)} &nbsp;·&nbsp; Species reported (14 days): ${post.totalSpecies} &nbsp;·&nbsp; Observations: ${post.totalObservations}${featured?.comName ? ` &nbsp;·&nbsp; Featured: ${escapeHtml(featured.comName)}` : ''}
   </div>
   <div class="author-bio">
-    <p><strong>About the author.</strong> <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan writer and birder based in Bay City. He publishes <a href="${SITE}">Michigan Birding Daily</a>, the <a href="https://birding.chrisizworski.com">Michigan Birding Report</a>, <a href="https://troutdaily.chrisizworski.com">Michigan Trout Daily</a>, and the <a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a>.</p>
+    <p><strong>About the author.</strong> <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan writer and birder based in Bay City. He publishes <a href="${SITE}">Michigan Birding Daily</a>, the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>, <a href="https://daily.michigantroutreport.com">Michigan Trout Daily</a>, and the <a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a>.</p>
   </div>
   <div class="related">
     <h3>More from Chris Izworski</h3>
     <ul>
       <li><a href="/chris-izworski">All Michigan Birding Daily reports by Chris Izworski</a></li>
-      <li><a href="https://birding.chrisizworski.com">Michigan Birding Report: live data for all 83 counties</a></li>
-      <li><a href="https://troutdaily.chrisizworski.com">Michigan Trout Daily</a></li>
+      <li><a href="https://michiganbirdingreport.com">Michigan Birding Report: live data for all 83 counties</a></li>
+      <li><a href="https://daily.michigantroutreport.com">Michigan Trout Daily</a></li>
       <li><a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a></li>
-      <li><a href="${AUTHOR_URL}/about/">About Chris Izworski</a></li>
+      <li><a href="${AUTHOR_URL}">About Chris Izworski</a></li>
     </ul>
   </div>
 </div>
