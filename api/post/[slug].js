@@ -51,6 +51,9 @@ export default async function handler(req, res) {
         url: AUTHOR_URL,
         sameAs: [
           'https://chrisizworski.com',
+          'https://chrisizworski.com/chris-izworski/',
+          'https://github.com/izworskic',
+          'https://izworskic.github.io/',
           AUTHOR_URL,
           'https://michigantroutreport.com',
           'https://daily.michigantroutreport.com',
@@ -154,7 +157,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;l
     County: ${escapeHtml(post.county)} &nbsp;·&nbsp; Species reported (14 days): ${post.totalSpecies} &nbsp;·&nbsp; Observations: ${post.totalObservations}${featured?.comName ? ` &nbsp;·&nbsp; Featured: ${escapeHtml(featured.comName)}` : ''}
   </div>
   <div class="author-bio">
-    <p><strong>About the author.</strong> <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan writer and birder based in Bay City. He publishes <a href="${SITE}">Michigan Birding Daily</a>, the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>, <a href="https://daily.michigantroutreport.com">Michigan Trout Daily</a>, and the <a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a>.</p>
+    <p><strong>About the author.</strong> <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan writer and birder based in Bay City. He publishes <a href="${SITE}">Michigan Birding Daily</a>, the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>, <a href="https://daily.michigantroutreport.com">Michigan Trout Daily</a>, and the <a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a>. His public project index is at <a href="https://chrisizworski.com/projects/">chrisizworski.com/projects</a>.</p>
   </div>
   <div class="related">
     <h3>More from Chris Izworski</h3>
@@ -163,6 +166,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;l
       <li><a href="https://michiganbirdingreport.com">Michigan Birding Report: live data for all 83 counties</a></li>
       <li><a href="https://daily.michigantroutreport.com">Michigan Trout Daily</a></li>
       <li><a href="https://gazette.chrisizworski.com">Great Lakes Gazette</a></li>
+      <li><a href="https://izworskic.github.io/">Chris Izworski GitHub Pages profile</a></li>
       <li><a href="${AUTHOR_URL}">About Chris Izworski</a></li>
     </ul>
   </div>

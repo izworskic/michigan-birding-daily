@@ -40,6 +40,9 @@ function buildPage(posts) {
           url: AUTHOR_URL,
           sameAs: [
             'https://chrisizworski.com',
+            'https://chrisizworski.com/chris-izworski/',
+            'https://github.com/izworskic',
+            'https://izworskic.github.io/',
             AUTHOR_URL,
             'https://michigantroutreport.com',
             'https://daily.michigantroutreport.com',
@@ -134,7 +137,7 @@ ul{list-style:none;padding:0}
   <h1>${escapeHtml(AUTHOR)}</h1>
   <p class="lede">Daily Michigan birding reports archive ${posts.length ? ` (${posts.length} entries)` : ''}.</p>
   <div class="author-intro">
-    <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan birder and the founder of the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>. This page is the complete archive of his daily county-by-county birding reports. Each report covers one Michigan county, pulls live data from eBird for the past 14 days, includes the NWS weather forecast, and recommends specific hotspots for birders heading out that day. Published every morning at 8 AM.
+    <a href="${AUTHOR_URL}">${escapeHtml(AUTHOR)}</a> is a Michigan birder and the founder of the <a href="https://michiganbirdingreport.com">Michigan Birding Report</a>. This page is the complete archive of his daily county-by-county birding reports. Each report covers one Michigan county, pulls live data from eBird for the past 14 days, includes the NWS weather forecast, and recommends specific hotspots for birders heading out that day. Published every morning at 8 AM. See also the <a href="https://chrisizworski.com/projects/">Chris Izworski project index</a> and <a href="https://izworskic.github.io/">GitHub Pages profile</a>.
   </div>
   ${posts.length ? `<ul>${items}</ul>` : '<div class="empty">No reports published yet. Check back tomorrow morning at 8 AM.</div>'}
 </div>
