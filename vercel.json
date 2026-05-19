@@ -1,11 +1,66 @@
 {
   "rewrites": [
-    { "source": "/chris-izworski", "destination": "/api/chris-izworski" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/post/:slug", "destination": "/api/post/[slug]" },
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    {
+      "source": "/chris-izworski",
+      "destination": "/api/chris-izworski"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/post/:slug",
+      "destination": "/api/post/[slug]"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
   ],
   "crons": [
-    { "path": "/api/cron", "schedule": "0 13 * * *" }
-  ]
+    {
+      "path": "/api/cron",
+      "schedule": "0 13 * * *"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<sub>.*)\\.vercel\\.app"
+        }
+      ],
+      "destination": "https://daily.michiganbirdingreport.com/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<sub>.*)\\.vercel\\.app"
+        }
+      ],
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
