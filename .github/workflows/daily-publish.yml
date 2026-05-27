@@ -1,0 +1,19 @@
+name: Daily Birding Report
+
+# Reliable daily trigger for the birding report generator.
+# Vercel's own cron (vercel.json) is kept as a secondary trigger; the
+# idempotency guard in api/cron.js ensures only one post per day.
+on:
+  schedule:
+    - cron: '0 13 * * *'   # 13:00 UTC daily (matches vercel.json)
+  workflow_dispatch: {}     # allow manual runs
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger /api/cron
+        run: |
+          curl -sS -X GET "https://daily.michiganbirdingreport.com/api/cron" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            --fail --max-time 180 -w "\nHTTP %{http_code}\n"

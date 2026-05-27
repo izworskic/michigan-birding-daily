@@ -36,6 +36,16 @@ export default async function handler(req, res) {
   if (!r) return res.status(500).json({ error: 'Redis not configured' });
 
   try {
+    // Idempotency: if today's post already exists, skip. Prevents double-posting
+    // when both the Vercel cron and the GitHub Actions trigger fire the same day.
+    try {
+      const latest = await r.lrange('birding:post:index', 0, 0);
+      if (Array.isArray(latest) && latest[0] && String(latest[0]).startsWith(`${todayUTC()}-`)) {
+        log.push(`[${ts()}] Skip: already published today (${latest[0]})`);
+        return res.status(200).json({ ok: true, skipped: 'already published today', slug: latest[0], log });
+      }
+    } catch(e) { log.push(`[${ts()}] idempotency check failed, proceeding: ${e.message}`); }
+
     // County rotation — stored in Redis, incremented each run, wraps at 83
     let idx = 0;
     try {
