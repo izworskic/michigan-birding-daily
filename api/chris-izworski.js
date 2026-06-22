@@ -1,4 +1,4 @@
-// GET /chris-izworski — Author archive listing all birding posts
+// GET /chris-izworski · Author archive listing all birding posts
 import { Redis } from '@upstash/redis';
 
 const SITE = 'https://birdingdaily.chrisizworski.com';
@@ -53,7 +53,7 @@ function buildPage(posts) {
       {
         '@type': 'CollectionPage',
         url: `${SITE}/chris-izworski`,
-        name: `${AUTHOR} — Daily Michigan Birding Reports Archive`,
+        name: `${AUTHOR} · Daily Michigan Birding Reports Archive`,
         description: `Complete archive of daily Michigan birding reports by ${AUTHOR}. ${posts.length} daily county-by-county reports using live eBird data.`,
         author: { '@id': 'https://chrisizworski.com/#person' },
         mainEntity: {
@@ -82,17 +82,19 @@ function buildPage(posts) {
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${escapeHtml(AUTHOR)} — Daily Michigan Birding Reports Archive | Michigan Birding Daily</title>
+<title>${escapeHtml(AUTHOR)} · Daily Michigan Birding Reports Archive | Michigan Birding Daily</title>
 <meta name="description" content="Complete archive of daily Michigan birding reports by ${escapeHtml(AUTHOR)}. ${posts.length} daily county-by-county reports using live eBird data, weather, and hotspot recommendations.">
 <meta name="author" content="${escapeHtml(AUTHOR)}">
 <meta name="keywords" content="Chris Izworski, Michigan birding, eBird Michigan, Michigan birds, county birding reports, Bay City birder">
 <link rel="canonical" href="${SITE}/chris-izworski">
 <link rel="author" href="${AUTHOR_URL}">
 <meta property="og:type" content="profile">
-<meta property="og:title" content="${escapeHtml(AUTHOR)} — Michigan Birding Daily Archive">
+<meta property="og:title" content="${escapeHtml(AUTHOR)} · Michigan Birding Daily Archive">
 <meta property="og:description" content="${posts.length} daily Michigan birding reports by ${escapeHtml(AUTHOR)}.">
 <meta property="og:url" content="${SITE}/chris-izworski">
 <meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://daily.michiganbirdingreport.com/og-image.png">
+<meta name="twitter:image" content="https://daily.michiganbirdingreport.com/og-image.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
 <script type="application/ld+json">${schema}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">

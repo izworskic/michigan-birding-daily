@@ -1,4 +1,4 @@
-// Server-rendered post page — reads from Redis, renders full SEO HTML
+// Server-rendered post page · reads from Redis, renders full SEO HTML
 import { Redis } from '@upstash/redis';
 
 function makeRedis() {
@@ -95,6 +95,8 @@ export default async function handler(req, res) {
 <meta property="og:description" content="${escapeHtml(AUTHOR)} on birding in ${escapeHtml(post.county)} County, Michigan.">
 <meta property="og:url" content="${postUrl}">
 <meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://daily.michiganbirdingreport.com/og-image.png">
+<meta name="twitter:image" content="https://daily.michiganbirdingreport.com/og-image.png">
 <meta name="twitter:title" content="${escapeHtml(displayTitle)}">
 <script type="application/ld+json">${schema}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
