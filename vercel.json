@@ -25,14 +25,25 @@
   ],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "(?<sub>.*)\\.vercel\\.app"
         }
       ],
-      "destination": "https://daily.michiganbirdingreport.com/:path*",
+      "destination": "https://daily.michiganbirdingreport.com/",
+      "permanent": true
+    },
+    {
+      "source": "/:path((?!api/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<sub>.*)\\.vercel\\.app"
+        }
+      ],
+      "destination": "https://daily.michiganbirdingreport.com/:path",
       "permanent": true
     }
   ],
@@ -62,5 +73,10 @@
       ]
     }
   ],
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/cron.js": {
+      "maxDuration": 300
+    }
+  }
 }
