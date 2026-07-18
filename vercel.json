@@ -29,6 +29,28 @@
       "has": [
         {
           "type": "host",
+          "value": "birdingdaily\\.chrisizworski\\.com"
+        }
+      ],
+      "destination": "https://daily.michiganbirdingreport.com/",
+      "permanent": true
+    },
+    {
+      "source": "/:path((?!api/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "birdingdaily\\.chrisizworski\\.com"
+        }
+      ],
+      "destination": "https://daily.michiganbirdingreport.com/:path",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
           "value": "(?<sub>.*)\\.vercel\\.app"
         }
       ],

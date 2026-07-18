@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     return res.status(500).send(`<h1>Error</h1><p>${escapeHtml(e.message)}</p>`);
   }
 
-  const SITE = 'https://birdingdaily.chrisizworski.com';
+  const SITE = 'https://daily.michiganbirdingreport.com';
   const AUTHOR = 'Chris Izworski';
   const AUTHOR_URL = 'https://chrisizworski.com';
   const postUrl = `${SITE}/post/${post.slug}`;
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
           'https://trout.chrisizworski.com',
           'https://troutdaily.chrisizworski.com',
           'https://birding.chrisizworski.com',
-          'https://birdingdaily.chrisizworski.com',
+          'https://daily.michiganbirdingreport.com',
           'https://gazette.chrisizworski.com',
           'https://lawn.chrisizworski.com',
           'https://freighterviewfarms.com',

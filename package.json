@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Daily Michigan county birding report. By Chris Izworski.",
   "type": "module",
+  "scripts": {
+    "test": "node scripts/check-seo.mjs"
+  },
   "engines": { "node": "20.x" },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",

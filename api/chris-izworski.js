@@ -1,7 +1,7 @@
 // GET /chris-izworski · Author archive listing all birding posts
 import { Redis } from '@upstash/redis';
 
-const SITE = 'https://birdingdaily.chrisizworski.com';
+const SITE = 'https://daily.michiganbirdingreport.com';
 const AUTHOR = 'Chris Izworski';
 const AUTHOR_URL = 'https://chrisizworski.com';
 

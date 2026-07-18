@@ -10,7 +10,7 @@ function makeRedis() {
 export default async function handler(req, res) {
   const r = makeRedis();
   const today = new Date().toISOString().slice(0, 10);
-  const SITE = 'https://birdingdaily.chrisizworski.com';
+  const SITE = 'https://daily.michiganbirdingreport.com';
 
   let postUrls = '';
   if (r) {
