@@ -101,27 +101,21 @@ export default async function handler(req, res) {
     log.push(`[${ts()}] Stored post in Redis: ${slug}`);
 
     // IndexNow ping (Bing/Yandex)
-    const postUrl    = `https://birdingdaily.chrisizworski.com/post/${slug}`;
-    const archiveUrl = `https://birdingdaily.chrisizworski.com/chris-izworski`;
+    const postUrl    = `https://daily.michiganbirdingreport.com/post/${slug}`;
+    const archiveUrl = `https://daily.michiganbirdingreport.com/chris-izworski`;
     try {
       await fetch('https://api.indexnow.org/indexnow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: JSON.stringify({
-          host:        'birdingdaily.chrisizworski.com',
+          host:        'daily.michiganbirdingreport.com',
           key:         'c9d2a1b5e7f3468a9c4d2e5f1a6b7c8d',
-          keyLocation: 'https://birdingdaily.chrisizworski.com/c9d2a1b5e7f3468a9c4d2e5f1a6b7c8d.txt',
+          keyLocation: 'https://daily.michiganbirdingreport.com/c9d2a1b5e7f3468a9c4d2e5f1a6b7c8d.txt',
           urlList:     [postUrl, archiveUrl],
         }),
       });
       log.push(`[${ts()}] IndexNow pinged`);
     } catch(e) { log.push(`[${ts()}] IndexNow err: ${e.message}`); }
-
-    // Google sitemap ping (legacy but works)
-    try {
-      await fetch('https://www.google.com/ping?sitemap=https://birdingdaily.chrisizworski.com/sitemap.xml');
-      log.push(`[${ts()}] Google pinged`);
-    } catch(e) {}
 
     return res.status(200).json({ ok: true, post: { slug, title, county: county.name }, log });
   } catch(e) {
