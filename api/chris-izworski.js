@@ -3,7 +3,7 @@ import { Redis } from '@upstash/redis';
 
 const SITE = 'https://daily.michiganbirdingreport.com';
 const AUTHOR = 'Chris Izworski';
-const AUTHOR_URL = 'https://chrisizworski.com';
+const AUTHOR_URL = 'https://chrisizworski.com/chris-izworski/';
 
 function makeRedis() {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
