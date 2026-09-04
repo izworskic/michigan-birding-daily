@@ -1,8 +1,9 @@
 {
+  "buildCommand": "node scripts/inject-ga4.mjs",
   "rewrites": [
     {
       "source": "/chris-izworski",
-      "destination": "/api/chris-izworski"
+      "destination": "/api/chris-izworski-page"
     },
     {
       "source": "/sitemap.xml",
@@ -10,7 +11,7 @@
     },
     {
       "source": "/post/:slug",
-      "destination": "/api/post/[slug]"
+      "destination": "/api/post-page?slug=:slug"
     },
     {
       "source": "/api/(.*)",
