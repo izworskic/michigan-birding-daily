@@ -17,6 +17,10 @@ export default async function handler(req, res) {
     if (typeof output === 'string' && /<\/head>/i.test(output) && !output.includes(MEASUREMENT_ID)) {
       output = output.replace(/<\/head>/i, `${GA4_TAG}\n</head>`);
     }
+    if (typeof output === 'string' && /<\/head>/i.test(output) &&
+        (!res.statusCode || res.statusCode < 400) && !output.includes('/assets/network-ads-v1.js')) {
+      output = output.replace(/<\/head>/i, '<script defer src="https://chrisizworski.com/assets/network-ads-v1.js"></script>\n</head>');
+    }
     return originalSend(output);
   };
   return profileHandler(req, res);
