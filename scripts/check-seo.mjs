@@ -36,3 +36,20 @@ if (legacyRedirects.some(rule => !rule.destination.startsWith(`https://${canonic
 }
 
 console.log('SEO host checks passed.');
+
+const profile = 'https://chrisizworski.com/chris-izworski/';
+const homepage = 'https://chrisizworski.com/';
+const person = 'https://chrisizworski.com/#person';
+const homePage = readFileSync('public/index.html', 'utf8');
+if (!homePage.includes(`<link rel="author" href="${profile}">`)) {
+  throw new Error('Homepage must link author metadata to the canonical profile');
+}
+if (!homePage.includes(`"@id":"${person}"`) || !homePage.includes(`"url":"${homepage}"`)) {
+  throw new Error('Homepage must define Chris Izworski with the canonical Person id and homepage URL');
+}
+if (!homePage.includes(`"author":{"@id":"${person}"}`) || !homePage.includes(`"publisher":{"@id":"${person}"}`)) {
+  throw new Error('Homepage author and publisher must resolve to the canonical Person');
+}
+if (!homePage.includes(`Michigan Birding Daily &nbsp;·&nbsp; By <a href="${profile}">Chris Izworski</a>`)) {
+  throw new Error('Visible creator credit must link to the canonical profile');
+}
