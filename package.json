@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node scripts/check-seo.mjs"
   },
-  "engines": { "node": "20.x" },
+  "engines": { "node": "24.x" },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
     "@upstash/redis": "^1.35.0"
