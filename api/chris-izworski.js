@@ -1,15 +1,13 @@
 // GET /chris-izworski · Author archive listing all birding posts
-import { Redis } from '@upstash/redis';
+import { ToolState } from '../lib/tool-state.cjs';
 
 const SITE = 'https://daily.michiganbirdingreport.com';
 const AUTHOR = 'Chris Izworski';
 const AUTHOR_URL = 'https://chrisizworski.com/chris-izworski/';
 
-function makeRedis() {
-  const url   = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  return new Redis({ url, token });
+function makeState() {
+      if (!process.env.TOOL_STATE_URL) return null;
+  return new ToolState();
 }
 
 function escapeHtml(s) {
@@ -145,7 +143,7 @@ ul{list-style:none;padding:0}
 }
 
 export default async function handler(req, res) {
-  const r = makeRedis();
+  const r = makeState();
   if (!r) return res.status(503).send('<h1>Storage unavailable</h1>');
 
   try {
