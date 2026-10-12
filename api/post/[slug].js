@@ -1,11 +1,9 @@
-// Server-rendered post page · reads from Redis, renders full SEO HTML
-import { Redis } from '@upstash/redis';
+// Server-rendered post page · reads from private state, renders full SEO HTML
+import { ToolState } from '../../lib/tool-state.cjs';
 
-function makeRedis() {
-  const url   = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  return new Redis({ url, token });
+function makeState() {
+      if (!process.env.TOOL_STATE_URL) return null;
+  return new ToolState();
 }
 
 function escapeHtml(s) {
@@ -14,7 +12,7 @@ function escapeHtml(s) {
 
 export default async function handler(req, res) {
   const { slug } = req.query;
-  const r = makeRedis();
+  const r = makeState();
   if (!r) return res.status(503).send('<h1>Storage unavailable</h1>');
 
   let post;

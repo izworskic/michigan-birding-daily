@@ -1,8 +1,8 @@
 // Michigan Birding Daily — daily cron
 // 8am CT (13:00 UTC during CST, 12:00 UTC during CDT). Schedule in vercel.json at 13:00 UTC.
-// Rotates through 83 Michigan counties, generates a post, stores in Redis, pings IndexNow.
+// Rotates through 83 Michigan counties, generates a post, stores in private state, pings IndexNow.
 
-import { Redis } from '@upstash/redis';
+import { ToolState } from '../lib/tool-state.cjs';
 import { COUNTIES } from '../lib/counties.js';
 import { fetchRecentObs, fetchNotable, fetchHotspots, summarizeObservations } from '../lib/ebird.js';
 import { fetchWeather } from '../lib/weather.js';
@@ -18,11 +18,9 @@ function secondsUntilMidnight() {
   return Math.floor((midnight - now) / 1000);
 }
 
-function makeRedis() {
-  const url   = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  return new Redis({ url, token });
+function makeState() {
+      if (!process.env.TOOL_STATE_URL) return null;
+  return new ToolState();
 }
 
 export default async function handler(req, res) {
@@ -32,8 +30,8 @@ export default async function handler(req, res) {
   }
 
   const log = [];
-  const r = makeRedis();
-  if (!r) return res.status(500).json({ error: 'Redis not configured' });
+  const r = makeState();
+  if (!r) return res.status(500).json({ error: 'private state not configured' });
 
   try {
     // Idempotency: if today's post already exists, skip. Prevents double-posting
@@ -46,7 +44,7 @@ export default async function handler(req, res) {
       }
     } catch(e) { log.push(`[${ts()}] idempotency check failed, proceeding: ${e.message}`); }
 
-    // County rotation — stored in Redis, incremented each run, wraps at 83
+    // County rotation — stored in private state, incremented each run, wraps at 83
     let idx = 0;
     try {
       idx = (await r.incr('birding:county:index')) - 1;
@@ -94,11 +92,11 @@ export default async function handler(req, res) {
       generatedAt: ts(),
     };
 
-    // Store in Redis
+    // Store in private state
     await r.set(`birding:post:${slug}`, JSON.stringify(post));
     // Keep an index of all post slugs, newest first
     await r.lpush('birding:post:index', slug);
-    log.push(`[${ts()}] Stored post in Redis: ${slug}`);
+    log.push(`[${ts()}] Stored post in private state: ${slug}`);
 
     // IndexNow ping (Bing/Yandex)
     const postUrl    = `https://daily.michiganbirdingreport.com/post/${slug}`;
