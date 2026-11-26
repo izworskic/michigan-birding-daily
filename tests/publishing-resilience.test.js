@@ -33,3 +33,9 @@ test('actual generator falls back on credential loss and rejects invalid model o
  assert.equal(bad.mode,'source-fallback');assert.equal(bad.reason,'invalid-provider-output');
  await assert.rejects(generateBirdingPost(county,{...data,summary:{species:[],totalObservations:0}},{now,env:{}}));
 });
+
+test('permission denial does not rotate credentials',async()=>{
+ const calls=[];
+ const result=await credentialedArticle('prompt',{env:{ANTHROPIC_API_KEY_FALL_COLOR:'a',ANTHROPIC_API_KEY:'b'},request:async k=>{calls.push(k);throw Object.assign(new Error('permission denied'),{status:403})}});
+ assert.deepEqual(calls,['a']);assert.equal(result.html,null);
+});
