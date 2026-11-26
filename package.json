@@ -4,7 +4,7 @@
   "description": "Daily Michigan county birding report. By Chris Izworski.",
   "type": "module",
   "scripts": {
-    "test": "node scripts/check-seo.mjs"
+    "test": "node scripts/check-seo.mjs && node --test tests/*.test.js"
   },
   "engines": {
     "node": "24.x"
