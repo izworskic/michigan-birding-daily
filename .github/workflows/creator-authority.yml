@@ -22,5 +22,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Run owner SEO gate
+      - run: npm ci
+      - name: Run owner SEO and publishing gate
         run: npm test

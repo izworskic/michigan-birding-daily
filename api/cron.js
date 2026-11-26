@@ -1,4 +1,4 @@
-// Michigan Birding Daily — daily cron
+// Michigan Birding Daily - daily cron
 // 8am CT (13:00 UTC during CST, 12:00 UTC during CDT). Schedule in vercel.json at 13:00 UTC.
 // Rotates through 83 Michigan counties, generates a post, stores in private state, pings IndexNow.
 
@@ -8,6 +8,7 @@ import { fetchRecentObs, fetchNotable, fetchHotspots, summarizeObservations } fr
 import { fetchWeather } from '../lib/weather.js';
 import { calcSunTimes } from '../lib/sun.js';
 import { generateBirdingPost } from '../lib/generator.js';
+import { evidenceRows, validateArticle } from '../lib/publishing-resilience.js';
 
 function ts() { return new Date().toISOString(); }
 function todayUTC() { return new Date().toISOString().slice(0, 10); }
@@ -25,26 +26,29 @@ function makeState() {
 
 export default async function handler(req, res) {
   const auth = req.headers['authorization'];
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const log = [];
+  const publicationDay = todayUTC();
   const r = makeState();
   if (!r) return res.status(500).json({ error: 'private state not configured' });
 
   try {
-    // Idempotency: if today's post already exists, skip. Prevents double-posting
-    // when both the Vercel cron and the GitHub Actions trigger fire the same day.
-    try {
-      const latest = await r.lrange('birding:post:index', 0, 0);
-      if (Array.isArray(latest) && latest[0] && String(latest[0]).startsWith(`${todayUTC()}-`)) {
-        log.push(`[${ts()}] Skip: already published today (${latest[0]})`);
-        return res.status(200).json({ ok: true, skipped: 'already published today', slug: latest[0], log });
-      }
-    } catch(e) { log.push(`[${ts()}] idempotency check failed, proceeding: ${e.message}`); }
+    // A bounded lock is longer than the 300-second function timeout. Do not
+    // proceed on storage failures or competing triggers; expiry allows retry.
+    const latest = await r.lrange('birding:post:index', 0, 0);
+    if (Array.isArray(latest) && latest[0] && String(latest[0]).startsWith(publicationDay+'-')) {
+      const existing = await r.get('birding:post:'+latest[0]);
+      if (!existing?.html) throw new Error('Current index entry has no article');
+      validateArticle(existing.html);
+      return res.status(200).json({ok:true,skipped:'already published today',slug:latest[0],log});
+    }
+    const lock = await r.set('birding:publish-lock:'+publicationDay,'1',{nx:true,ex:360});
+    if(lock!=='OK')return res.status(409).json({ok:false,error:'publisher already running',log});
 
-    // County rotation — stored in private state, incremented each run, wraps at 83
+    // County rotation - stored in private state, incremented each run, wraps at 83
     let idx = 0;
     try {
       idx = (await r.incr('birding:county:index')) - 1;
@@ -53,7 +57,7 @@ export default async function handler(req, res) {
       idx = Math.floor(Math.random() * COUNTIES.length);
     }
     const county = COUNTIES[idx];
-    log.push(`[${ts()}] Birding post: ${county.name} County (${county.region}) — index ${idx}`);
+    log.push(`[${ts()}] Birding post: ${county.name} County (${county.region}) - index ${idx}`);
 
     // Fetch everything in parallel
     const [rawObs, notable, hotspots, weather] = await Promise.all([
@@ -63,24 +67,30 @@ export default async function handler(req, res) {
       fetchWeather(county.lat, county.lon).catch(e => { log.push(`[weather err] ${e.message}`); return null; }),
     ]);
 
-    const summary = summarizeObservations(rawObs);
+    const observed = evidenceRows(rawObs);
+    if (!observed.length) throw new Error('No usable recent public eBird observations');
+    const publicNotable = evidenceRows(notable);
+    const publicHotspots = Array.isArray(hotspots) ? hotspots.filter(h=>h && typeof h.locName==='string' && h.locName.trim()) : [];
+    const summary = summarizeObservations(observed);
     const sunTimes = calcSunTimes(county.lat, county.lon, new Date());
 
     log.push(`[${ts()}] Data: ${summary.totalSpecies} species, ${summary.totalObservations} obs, ${notable.length} notable, ${hotspots.length} hotspots, weather=${weather ? 'ok' : 'none'}`);
 
     // Generate post
-    const html = await generateBirdingPost(county, { summary, notable, hotspots, weather, sunTimes });
+    const generated = await generateBirdingPost(county, { summary, notable:publicNotable, hotspots:publicHotspots, weather, sunTimes });
+    const html = validateArticle(generated.html);
+    log.push('Generation mode: '+generated.mode+(generated.reason?' ('+generated.reason+')':''));
 
     // Extract title from H1
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
     const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : `${county.name} County Birding Report`;
 
     // Slug: YYYY-MM-DD-county-name
-    const slug = `${todayUTC()}-${slugify(county.name)}-county`;
+    const slug = `${publicationDay}-${slugify(county.name)}-county`;
 
     const post = {
       slug,
-      date: todayUTC(),
+      date: publicationDay,
       county: county.name,
       countyCode: county.code,
       region: county.region,
@@ -88,7 +98,9 @@ export default async function handler(req, res) {
       html,
       totalSpecies: summary.totalSpecies,
       totalObservations: summary.totalObservations,
-      notableCount: notable.length,
+      notableCount: publicNotable.length,
+      generationMode: generated.mode,
+      generationReason: generated.reason,
       generatedAt: ts(),
     };
 
@@ -115,7 +127,7 @@ export default async function handler(req, res) {
       log.push(`[${ts()}] IndexNow pinged`);
     } catch(e) { log.push(`[${ts()}] IndexNow err: ${e.message}`); }
 
-    return res.status(200).json({ ok: true, post: { slug, title, county: county.name }, log });
+    return res.status(200).json({ ok: true, post: { slug, title, county: county.name, generationMode: generated.mode }, log });
   } catch(e) {
     log.push(`[${ts()}] FATAL: ${e.message}`);
     console.error('[cron]', e);

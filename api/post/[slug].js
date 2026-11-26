@@ -28,6 +28,7 @@ export default async function handler(req, res) {
   const AUTHOR = 'Chris Izworski';
   const AUTHOR_URL = 'https://chrisizworski.com';
   const postUrl = `${SITE}/post/${post.slug}`;
+  const generationNote = post.generationMode === 'source-fallback' ? 'Source-based edition assembled from dated eBird records and available forecasts.' : '';
   const displayTitle = `${AUTHOR}: ${post.title}`;
 
   const dateLong = new Date(post.date + 'T12:00:00Z').toLocaleDateString('en-US', {
@@ -141,6 +142,7 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;l
   <div class="post-date">${dateLong}</div>
   <h1>${escapeHtml(displayTitle)}</h1>
   <article class="post-body">
+    ${generationNote ? `<p class="generation-note">${escapeHtml(generationNote)}</p>` : ''}
     ${(post.html || '').replace(/^\s*<h1\b[^>]*>[\s\S]*?<\/h1>\s*/i, '')}
   </article>
   <div class="post-meta" style="margin-top:30px;padding-top:20px;border-top:1px solid #ddd;border-bottom:none">
